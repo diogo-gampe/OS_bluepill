@@ -1,18 +1,23 @@
-#include <Arduino.h>
+#include <stm32f103x6.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-// put function declarations here:
-int myFunction(int, int);
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-}
+#include "clock.h"
+#include "gpio.h"
+int main(void){
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+initSysClockPLL();
+initGPIOConfig(GPIOA, 0, OUTPUT_PUSHPULL, GPIO_MODE_OUT_10MHz);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+volatile uint32_t count = 0;
+  while(1){
+
+    while(count < 100000){
+      count++;
+    }
+    gpioToggle(GPIOA, 0);
+    count = 0;
+  }
+  return 0;
 }
