@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
 typedef enum{
 
     GPIO_MODE_INPUT  = 0x0,

@@ -5,7 +5,7 @@
 void initGPIOConfig(GPIO_TypeDef *port, uint8_t pin, GPIO_CONFIG_T config, GPIO_MODE_T mode){
 
 
-    // 1️⃣ habilita clock do GPIO automaticamente
+    // habilita clock do GPIO automaticamente
     if(port == GPIOA)       RCC->APB2ENR |= (1 << 2);
     else if(port == GPIOB)  RCC->APB2ENR |= (1 << 3);
     else if(port == GPIOC)  RCC->APB2ENR |= (1 << 4);
