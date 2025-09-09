@@ -5,29 +5,26 @@
 /*Define funções para configurar interrupções geradas pelos timers                   */
 /*Recebe uma frequência em Hz, um prescaler de 1 até 65535 e uma frequência em MHz                          */
 
-void timer1ConfigInterrupt(uint16_t freq_hz, uint8_t clock_freq){
+bool timer1ConfigInterrupt(uint16_t freq_hz, uint8_t clock_freq, uint16_t prescaler){
 
-    uint16_t prescaler;
     uint16_t arr;
-     // Loop para encontrar PSC/ARR válidos
-    for (prescaler = 0; prescaler < 65536; prescaler++) {
-        arr = (clock_freq*(1000000UL) / ((prescaler + 1) * freq_hz)) - 1;
-        if (arr <= 0xFFFF) {
-            break;  // Encontrou valores válidos
-        }
-    }
-    
-    
+
     RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;  // Habilita clock TIM1
+    
+    arr = clock_freq*1000000UL / (prescaler * freq_hz) - 1;
+    if (arr > 0xFFFF)
+        return (false);
+
     TIM1->PSC = prescaler;
     TIM1->ARR = arr;
    
     TIM1->EGR = TIM_EGR_UG;  // gera update event
     TIM1->DIER |= TIM_DIER_UIE;      // Habilita interrupção de update
     NVIC_EnableIRQ(TIM1_UP_IRQn);    // NVIC
+    NVIC_SetPriority(TIM1_UP_IRQn, 1);
 
     TIM1->CR1 |= TIM_CR1_CEN;        // Inicia contador
-
+    return(true);
 }
 
 void timer1ConfigPWM(uint32_t freq_hz, uint8_t clock_freq, uint16_t prescaler, uint8_t duty_cycle, uint8_t channel){
