@@ -49,7 +49,7 @@ void initSysClockHSI(void){
 /*Retorna frequencia de clock em Hertz                  */
 uint32_t getClockFrequencyHz(){
 
-    uint32_t clock;
+    uint32_t clock = INT_CLOCK_FREQ;
     uint32_t source;
 
     /*captura registrador SWS que define fonte do sysclk        */
@@ -75,7 +75,7 @@ uint32_t getClockFrequencyHz(){
              if (pllsrc == 0) { // HSI/2
                 clock = (INT_CLOCK_FREQ / 2) * pllmul;
             } else {            // HSE
-                clock = EXT_CLOCK_FREQ* pllmul;
+                clock = EXT_CLOCK_FREQ * pllmul;
             }
             break;
         }

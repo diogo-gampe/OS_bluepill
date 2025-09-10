@@ -6,15 +6,23 @@
 #include "timer.h"
 #include "clock.h"
 #include "gpio.h"
+#include "uart.h"
+
+#define BAUDRATE 115200U
 
 
 int main(void){
 
 initSysClockPLL();
+initUART1(BAUDRATE);
 initGPIOConfig(GPIOA, 0, OUTPUT_PUSHPULL, GPIO_MODE_OUT_10MHz);
 timer1ConfigInterrupt(10, getClockFrequencyMHz(), 7200);
+char a = 'a';
 
   while(1){
+  
+    UART1_transmitByte(a);
+
   }
   return 0;
 }

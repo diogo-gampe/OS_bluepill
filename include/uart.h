@@ -3,8 +3,8 @@
 #include <stdbool.h>
 
 
-void initUART1(uint16_t baudrate);
-void transmitByte(uint8_t byte);
-void transmitString(uint8_t* string, uint8_t length);
-uint8_t receiveByte(void);
-uint8_t* receiveString(void);
+void initUART1(uint32_t baudrate);
+void UART1_transmitByte(uint8_t byte);
+void UART1_transmitString(uint8_t* string, uint8_t length);
+uint8_t UART1_receiveByte(void);
+uint8_t* UART1_receiveString(uint8_t* buffer, uint8_t maxlen);
