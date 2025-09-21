@@ -51,4 +51,22 @@ void gpioToggle(GPIO_TypeDef *port, uint8_t pin){
         gpioSet(port, pin);
     }
 }
+void gpioWriteBit(GPIO_TypeDef *port, uint8_t pin, bool value){
+
+    if (value) {
+        port->ODR |= (1 << pin);   // seta o bit
+    } else {
+        port->ODR &= ~(1 << pin);  // limpa o bit
+    }
+}
+
+
+/*Escreve valor de 8bits em Px0 até Px7                     */
+void gpioWriteByte(GPIO_TypeDef *port, uint8_t value) {
+    // Limpa PA0..PA7
+    port->ODR &= ~0xFFu;
+
+    // Escreve novo valor nos 8 bits menos significativos
+    port->ODR |= (value & 0xFFu);
+}
 

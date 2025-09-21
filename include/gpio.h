@@ -39,3 +39,7 @@ bool gpioGet(GPIO_TypeDef *port, uint8_t pin);
 /*inverte valor do pino                                   */
 void gpioToggle(GPIO_TypeDef *port, uint8_t pin);
 
+/*insere bit desejado no pino                           */
+void gpioWriteBit(GPIO_TypeDef *port, uint8_t pin, bool value);
+/*insere byte desejado na porta                          */
+void gpioWriteByte(GPIO_TypeDef *port, uint8_t value);

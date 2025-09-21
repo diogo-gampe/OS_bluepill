@@ -27,6 +27,15 @@ void initSysClockPLL(void){
     RCC->CFGR &= ~(0x3 << 0); // limpa SW
     RCC->CFGR |= (2 << 0);
 
+    // AHB prescaler = 1 → HCLK = 36 MHz
+    RCC->CFGR &= ~RCC_CFGR_HPRE;  
+
+    // APB2 prescaler = 1 → PCLK2 = 36 MHz
+    RCC->CFGR &= ~RCC_CFGR_PPRE2;
+
+    // APB1 prescaler = 1 → PCLK1 = 36 MHz (permitido pois SYSCLK ≤ 36 MHz)
+    RCC->CFGR &= ~RCC_CFGR_PPRE1;
+
 }
 
 void initSysClockHSI(void){

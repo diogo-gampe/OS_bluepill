@@ -16,10 +16,9 @@ void initUART1(uint32_t baudrate)
 
       // 4. Calcula USARTDIV
     uint32_t clock = getClockFrequencyHz();  // clock APB2 em Hz
-    double usartdiv = (double)clock / (double)baudrate;
-
-    uint32_t mantissa = (uint32_t)usartdiv;
-    uint32_t fraction = (uint32_t)((usartdiv - mantissa) * 16.0 + 0.5); // arredonda
+   uint32_t usartdiv = (clock + (baudrate/2)) / baudrate; // arredonda para mais próximo
+    uint32_t mantissa = usartdiv / 16;
+    uint32_t fraction = usartdiv % 16;
 
     if (fraction == 16) {
         mantissa += 1;
@@ -27,12 +26,11 @@ void initUART1(uint32_t baudrate)
     }
 
     USART1->BRR = (mantissa << 4) | (fraction);
-
-    // 5. Habilita TX e RX
-    USART1->CR1 |= USART_CR1_TE | USART_CR1_RE;
-
-    // 6. Habilita USART
+    // USART1->BRR = 0x139;
+    // 5. Habilita USART
     USART1->CR1 |= USART_CR1_UE;
+    // 6. Habilita TX e RX
+    USART1->CR1 |= USART_CR1_TE | USART_CR1_RE;
 
 
 
@@ -41,13 +39,18 @@ void UART1_transmitByte(uint8_t byte)
 {
     while (!(USART1->SR & USART_SR_TXE)); // espera buffer livre
     USART1->DR = byte;
-    while (!(USART1->SR & USART_SR_TXE)); // espera buffer livre
+    gpioToggle(GPIOA, 0);
 
 }
-void UART1_transmitString(uint8_t* string, uint8_t length)
+void UART1_transmitString(uint8_t* string, uint8_t maxlen)
 {
-    for (uint8_t i = 0; i < length; i++) {
-        UART1_transmitByte(string[i]);
+    for (uint8_t i = 0; i < maxlen; i++) {
+        if(string[i] == '\0')
+            break;
+        else
+            UART1_transmitByte(string[i]);
+
+        
     }
 
 }
@@ -56,14 +59,17 @@ uint8_t UART1_receiveByte(void)
     while (!(USART1->SR & USART_SR_RXNE)); // espera dado chegar
     return (uint8_t)(USART1->DR & 0xFF);
 }
-uint8_t* UART1_receiveString(uint8_t* buffer, uint8_t maxlen)
+bool UART1_receiveString(uint8_t* buffer, uint8_t maxlen)
 {
     uint8_t i = 0;
-    while (i < (maxlen - 1)) {
+    while (i < maxlen) {
         buffer[i] = UART1_receiveByte();
+        if(buffer[i] == '\0')
+            break;
+        
         i++;
     }
     buffer[i] = '\0'; // termina string
-    return buffer;
+    return true;
 
 }

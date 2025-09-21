@@ -7,31 +7,52 @@
 #include "clock.h"
 #include "gpio.h"
 #include "uart.h"
+#include "interrupts.h"
 
 #define BAUDRATE 115200U
+#define MAX_STRING_LEN 255
 
+char c = 0x01;
+bool apagando = false;
+volatile bool tim_flag;
+uint8_t message[3] = {""};
+uint8_t byte = 'A';
 
 int main(void){
 
 initSysClockPLL();
 initUART1(BAUDRATE);
-initGPIOConfig(GPIOA, 0, OUTPUT_PUSHPULL, GPIO_MODE_OUT_10MHz);
-timer1ConfigInterrupt(10, getClockFrequencyMHz(), 7200);
-char a = 'a';
-
-  while(1){
-  
-    UART1_transmitByte(a);
-
-  }
-  return 0;
+for(int i = 0; i < 8; i++)
+{
+  initGPIOConfig(GPIOA, i, OUTPUT_PUSHPULL, GPIO_MODE_OUT_10MHz);
 }
 
-// Handler da interrupção
-void TIM1_UP_IRQHandler(void) {
-    if (TIM1->SR & TIM_SR_UIF) {
-        TIM1->SR &= ~TIM_SR_UIF;  // limpa flag 
-        gpioToggle(GPIOA, 0);
+timer1ConfigInterrupt(10, getClockFrequencyMHz(), 7200);
+
+while(1){
+  
+  
+  if(tim_flag)
+  {
+    gpioWriteByte(GPIOA, c);
+    if(!apagando)
+    {
+      c |= c << 1;
+      if(c == 0xFF)
+        apagando = true;
     }
-    return;
+    else 
+    {
+      c = c << 1;
+      if(c == 0x00){
+        c = 0x01;
+        apagando = false;
+      }
+    }
+    tim_flag = false;
+  }
+
+  }
+
+  return 0;
 }

@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "interrupts.h"
+
 /*Define funções para configurar interrupções geradas pelos timers                   */
 /*Recebe uma frequência em Hz, um prescaler de 1 até 65535 e uma frequência em MHz                          */
 
@@ -17,11 +19,9 @@ bool timer1ConfigInterrupt(uint16_t freq_hz, uint8_t clock_freq, uint16_t presca
 
     TIM1->PSC = prescaler;
     TIM1->ARR = arr;
-   
-    TIM1->EGR = TIM_EGR_UG;  // gera update event
-    TIM1->DIER |= TIM_DIER_UIE;      // Habilita interrupção de update
-    NVIC_EnableIRQ(TIM1_UP_IRQn);    // NVIC
-    NVIC_SetPriority(TIM1_UP_IRQn, 1);
+    TIM1->EGR  |= TIM_EGR_UG;    // Atualiza registros
+    
+    TIM1_UIF_Enable();
 
     TIM1->CR1 |= TIM_CR1_CEN;        // Inicia contador
     return(true);
